@@ -1,13 +1,14 @@
 import express, { json } from 'express';
 import { createServer } from 'http';
-import { connect, Schema, model } from 'mongoose';
-import socketIo from 'socket.io';
+import { connect } from 'mongoose';
+import { Server } from 'socket.io';
 import cors from 'cors';
+import Message from './models/messageModel.js';
 
 // Configuración básica
 const app = express();
 const server = createServer(app);
-const io = socketIo(server, {
+const io = new Server(server, {
     cors: {
         origin: 'http://localhost:3000',
         methods: ['GET', 'POST']
@@ -18,18 +19,27 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(json());
 
-// Conexión a MongoDB
-connect('mongodb://localhost:27017/chatbot', { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB conectado'))
-    .catch(err => console.error(err));
+// Inicializar DB
+const initializeDB = async () => {
+    const messageCount = await Message.countDocuments();
+    if (messageCount === 0) {
+        await Message.insertMany([
+            { user: 'Admin', message: 'Chat online', timestamp: new Date() },
+        ]);
+    }
+}
 
-// Modelo de Mensaje
-const MessageSchema = new Schema({
-    user: String,
-    message: String,
-    timestamp: { type: Date, default: Date.now }
-});
-const Message = model('Message', MessageSchema);
+// Conexión a MongoDB
+const connectToAtlas = async () => {
+    await connect(process.env.MONGO_URL)
+        .then(() => {
+            console.log('MongoDB conectado')
+            initializeDB();
+        })
+        .catch(err => console.error(err))
+}
+
+connectToAtlas()
 
 // API de mensajes
 app.get('/api/messages', async (req, res) => {
