@@ -1,12 +1,12 @@
-const express = require('express');
-const http = require('http');
-const mongoose = require('mongoose');
-const socketIo = require('socket.io');
-const cors = require('cors');
+import express, { json } from 'express';
+import { createServer } from 'http';
+import { connect, Schema, model } from 'mongoose';
+import socketIo from 'socket.io';
+import cors from 'cors';
 
 // Configuración básica
 const app = express();
-const server = http.createServer(app);
+const server = createServer(app);
 const io = socketIo(server, {
     cors: {
         origin: 'http://localhost:3000',
@@ -16,20 +16,20 @@ const io = socketIo(server, {
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
 // Conexión a MongoDB
-mongoose.connect('mongodb://localhost:27017/chatbot', { useNewUrlParser: true, useUnifiedTopology: true })
+connect('mongodb://localhost:27017/chatbot', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB conectado'))
     .catch(err => console.error(err));
 
 // Modelo de Mensaje
-const MessageSchema = new mongoose.Schema({
+const MessageSchema = new Schema({
     user: String,
     message: String,
     timestamp: { type: Date, default: Date.now }
 });
-const Message = mongoose.model('Message', MessageSchema);
+const Message = model('Message', MessageSchema);
 
 // API de mensajes
 app.get('/api/messages', async (req, res) => {
