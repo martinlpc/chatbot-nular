@@ -4,6 +4,7 @@ import { connect } from 'mongoose';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import Message from './models/messageModel.js';
+import Response from './models/responseModel.js';
 
 // Configuración básica
 const app = express();
@@ -53,9 +54,20 @@ io.on('connection', (socket) => {
 
     socket.on('sendMessage', async (data) => {
         console.log(`[msg][${socket.id}] ${data.user}: ${data.message}`);
-        const newMessage = new Message(data);
-        await newMessage.save();
-        io.emit('receiveMessage', data);
+
+        try {
+            const newMessage = new Message(data);
+            await newMessage.save();
+
+            // TODO: Logica de respuesta de bot
+            const autoResp = await Response.findOne({ trigger: data.message.toLowerCase() });
+
+            // Envío del mensaje del usuario al chat
+            io.emit('receiveMessage', data);
+
+        } catch (error) {
+            console.log('Error al procesar mensaje', error);
+        }
     });
 
     socket.on('disconnect', (reason) => {
