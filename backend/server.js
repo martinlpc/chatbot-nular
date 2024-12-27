@@ -49,16 +49,17 @@ app.get('/api/messages', async (req, res) => {
 
 // Comunicación con Socket.io
 io.on('connection', (socket) => {
-    console.log('Usuario conectado');
+    console.log(`Usuario conectado (${socket.id})`);
 
     socket.on('sendMessage', async (data) => {
+        console.log(`[msg][${socket.id}] ${data.user}: ${data.message}`);
         const newMessage = new Message(data);
         await newMessage.save();
         io.emit('receiveMessage', data);
     });
 
-    socket.on('disconnect', () => {
-        console.log('Usuario desconectado');
+    socket.on('disconnect', (reason) => {
+        console.log(`Usuario '${socket.id}' desconectado (${reason})`);
     });
 });
 
