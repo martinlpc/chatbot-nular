@@ -1,4 +1,3 @@
-// frontend/src/components/Chat.js
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
@@ -10,10 +9,20 @@ const Chat = () => {
     const [user, setUser] = useState('');
 
     useEffect(() => {
-        // Solicitar mensajes existentes
+        //Solicitar mensajes existentes
         fetch('http://localhost:4000/api/messages')
             .then(res => res.json())
             .then(data => setMessages(data));
+
+
+        socket.on('connect', () => {
+            console.log('Conectado al servidor');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Desconectado del servidor');
+        });
+
 
         // Escuchar nuevos mensajes
         socket.on('receiveMessage', (message) => {
