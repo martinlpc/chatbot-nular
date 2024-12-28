@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const ResponseSchema = new mongoose.Schema({
+const ResponseSchema = new Schema({
     trigger: {
         type: String,
         required: true
