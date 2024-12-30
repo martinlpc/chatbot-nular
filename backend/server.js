@@ -5,8 +5,8 @@ import { Server } from 'socket.io';
 import { PORT } from './config.js';
 import cors from 'cors';
 import Message from './models/messageModel.js';
-import Response from './models/responseModel.js';
-import messageHandler from './handlers/messageHandler.js';
+import chatbotRoutes from './routes/chatbotRoutes.js';
+import { handleUserMessage } from './controllers/chatbotController.js';
 
 // Configuración básica
 const app = express();
@@ -15,12 +15,16 @@ const io = new Server(server, {
     cors: {
         origin: 'http://localhost:3000',
         methods: ['GET', 'POST']
+    },
+    connectionStateRecovery: {
+        timeout: 30000
     }
 });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/api/chatbot', chatbotRoutes);
 
 // Inicializar DB
 const initializeDB = async () => {
@@ -54,7 +58,26 @@ app.get('/api/messages', async (req, res) => {
 const onConnection = (socket) => {
     console.log(`Usuario conectado (${socket.id})`);
 
-    messageHandler(io, socket);
+    socket.on('sendMessage', async (data) => {
+        console.log(`[new msg][${socket.id}] ${data.user}: ${data.message}`);
+
+        try {
+            const newMessage = new Message(data);
+            await newMessage.save();
+
+            //Impresión en el chat del mensaje del usuario
+            socket.emit('receiveMessage', data);
+
+            // Logica de respuesta de bot
+            const response = await handleUserMessage(data.message);
+            console.log(`[bot response] ${response}`);
+            // Respuesta del bot
+            socket.emit('receiveMessage', { user: 'bot', message: response })
+
+        } catch (error) {
+            console.log('Error al procesar mensaje', error);
+        }
+    })
 
     socket.on('disconnect', (reason) => {
         console.log(`Usuario '${socket.id}' desconectado (${reason})`);
