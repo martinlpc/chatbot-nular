@@ -35,7 +35,7 @@ function App() {
 
     // Escuchar respuestas del server
     socketInstance.on('receiveMessage', (data) => {
-      setChatLog((prev) => [...prev, { from: data.user, text: data.message }]);
+      setChatLog((prev) => [...prev, { user: data.user, message: data.message }]);
     });
 
     // Limpiar conexión al desmontar
