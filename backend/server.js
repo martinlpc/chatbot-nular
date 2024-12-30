@@ -1,10 +1,12 @@
-import express, { json } from 'express';
+import express from 'express';
 import { createServer } from 'http';
 import { connect } from 'mongoose';
 import { Server } from 'socket.io';
+import { PORT } from './config.js';
 import cors from 'cors';
 import Message from './models/messageModel.js';
 import Response from './models/responseModel.js';
+import messageHandler from './handlers/messageHandler.js';
 
 // Configuración básica
 const app = express();
@@ -18,7 +20,7 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors());
-app.use(json());
+app.use(express.json());
 
 // Inicializar DB
 const initializeDB = async () => {
@@ -49,32 +51,17 @@ app.get('/api/messages', async (req, res) => {
 });
 
 // Comunicación con Socket.io
-io.on('connection', (socket) => {
+const onConnection = (socket) => {
     console.log(`Usuario conectado (${socket.id})`);
 
-    socket.on('sendMessage', async (data) => {
-        console.log(`[msg][${socket.id}] ${data.user}: ${data.message}`);
-
-        try {
-            const newMessage = new Message(data);
-            await newMessage.save();
-
-            // TODO: Logica de respuesta de bot
-            const autoResp = await Response.findOne({ trigger: data.message.toLowerCase() });
-
-            // Envío del mensaje del usuario al chat
-            io.emit('receiveMessage', data);
-
-        } catch (error) {
-            console.log('Error al procesar mensaje', error);
-        }
-    });
+    messageHandler(io, socket);
 
     socket.on('disconnect', (reason) => {
         console.log(`Usuario '${socket.id}' desconectado (${reason})`);
     });
-});
+}
+
+io.on('connection', onConnection);
 
 // Iniciar servidor
-const PORT = 4000;
 server.listen(PORT, () => console.log(`Servidor ejecutándose en http://localhost:${PORT}`));
