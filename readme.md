@@ -2,6 +2,14 @@
 
 Un chatbot simple que utiliza **Socket.IO** para comunicación en tiempo real y una API REST para cargar mensajes previos.
 
+Ejemplos de frases que entiende el bot:
+
+-   "Hola!"
+-   "**Quiero** **pedir**/**ordenar** XXXXX"
+-   "Cual es su **domicilio**/**direccion**/**ubicacion**?"
+-   "**Horario** de atencion?"
+-   "Quiero ver el **menu**"
+
 ## Requisitos
 
 Antes de empezar, asegurarse de tener instalado:
