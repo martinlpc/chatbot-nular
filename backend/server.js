@@ -73,6 +73,8 @@ const onConnection = (socket) => {
             console.log(`[bot response] ${response}`);
             // Respuesta del bot
             socket.emit('receiveMessage', { user: 'bot', message: response })
+            const newBotMessage = new Message({ user: 'bot', message: response });
+            await newBotMessage.save();
 
         } catch (error) {
             console.log('Error al procesar mensaje', error);
