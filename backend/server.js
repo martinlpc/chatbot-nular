@@ -38,7 +38,7 @@ const initializeDB = async () => {
 
 // Conexión a MongoDB
 const connectToAtlas = async () => {
-    await connect(process.env.MONGO_URL)
+    await connect(process.env.MONGO_URI)
         .then(() => {
             console.log('MongoDB conectado')
             initializeDB();
