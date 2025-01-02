@@ -5,23 +5,10 @@ import './App.css'
 const SOCKET_SERVER_URL = 'http://localhost:4000';
 
 function App() {
-  const [user, setUser] = useState(''); // Nombre del usuario
+  //const [user, setUser] = useState(''); // Nombre del usuario
   const [input, setInput] = useState(''); // Mensaje del usuario
   const [chatLog, setChatLog] = useState([]); // Historial de chat
   const [socket, setSocket] = useState(null); // Instancia del socket
-
-  async function fetchMessages() {
-    try {
-      const response = await fetch(`${SOCKET_SERVER_URL}/api/messages`);
-      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-
-      const data = await response.json();
-      console.log(data)
-      setChatLog(data);
-    } catch (error) {
-      setChatLog([{ from: 'bot', text: `Error al cargar mensajes (${error.message})` }]);
-    }
-  }
 
   useEffect(() => {
     // Configuración inicial de Socket.IO
@@ -30,13 +17,28 @@ function App() {
     })
     setSocket(socketInstance);
 
-    // Solicitar mensajes existentes
-    fetchMessages();
+    socketInstance.on('connection-success', (data) => {
+      console.log(`Conectado al servidor con ID: ${data}`);
+    });
 
-    // Escuchar respuestas del server
-    socketInstance.on('receiveMessage', (data) => {
+    //  Manejo de error de conexion
+    socketInstance.on('connect_error', (err) => {
+      console.error('Error de conexión:', err);
+    });
+
+
+    // * RESPUESTAS DEL SERVER *
+
+    // Retorno del mensaje del usuario
+    socketInstance.on('msg-user', (data) => {
       setChatLog((prev) => [...prev, { user: data.user, message: data.message }]);
     });
+
+    // Respuesta del bot al mensaje del usuario
+    socketInstance.on('msg-bot', (data) => {
+      setChatLog((prev) => [...prev, { user: data.user, message: data.message }]);
+    });
+
 
     // Limpiar conexión al desmontar
     return () => {
@@ -50,18 +52,14 @@ function App() {
       alert('Por favor, ingrese su nombre y mensaje');
       return; // Evitar mensajes vacíos
     }
-    const message = { user, message: input };
+    const message = { user: 'user', message: input };
 
     // Enviar mensaje al backend
     if (socket) {
-      socket.emit('sendMessage', message);
+      socket.emit('msg-user', message);
     } else {
       console.error('Socket no conectado');
     }
-
-    // Actualizar el historial del chat localmente
-    //setChatLog((prev) => [...prev, { from: user, text: input }]);
-    //setInput(''); // Limpiar el campo de entrada
   };
 
   return (
@@ -77,17 +75,17 @@ function App() {
         }}
       >
         {chatLog.map((entry, index) => (
-          <p key={index} style={{ color: entry.user === 'bot' ? 'yellow' : 'green' }}>
+          <p key={index} style={{ color: entry.user === 'nular' ? 'yellow' : 'green' }}>
             <strong>{entry.user}:</strong> {entry.message}
           </p>
         ))}
       </div>
-      <textarea
+      {/* <textarea
         value={user}
         onChange={(e) => setUser(e.target.value)}
         placeholder="Tu nombre"
         style={{ width: '100%', marginBottom: '1rem' }}
-      />
+      /> */}
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
