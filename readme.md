@@ -80,11 +80,11 @@ Antes de empezar, asegurarse de tener instalado:
     ```bash
     yarn dev
     ```
-    El frontend estará disponible en http://localhost.3000
+    El frontend estará disponible en http://localhost:3000
 
 ## Uso
 
-1. Ingresar al frontend en http://localhost.3000
+1. Ingresar al frontend en http://localhost:3000
 2. Completar nombre e introducir un mensaje para enviar al chatbot
 3. Los mensajes se procesan en tiempo real
 
