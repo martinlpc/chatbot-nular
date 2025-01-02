@@ -2,15 +2,15 @@ import Order from "../models/orderModel.js"
 
 const queries = {
     horario: 'Nuestro horario de atención es de martes a domingo de 11:00 a 23:00 horas',
-    ubicacion: 'Nos encontramos en la calle Falsa 123',
-    direccion: 'Nos encontramos en la calle Falsa 123',
-    domicilio: 'Nos encontramos en la calle Falsa 123',
+    ubicacion: 'Nos encontramos en la calle Falsetti 1357, CABA',
+    direccion: 'Nos encontramos en la calle Falsetti 1357, CABA',
+    domicilio: 'Nos encontramos en la calle Falsetti 1357, CABA',
     menu: 'A continuación te muestro nuestro menú: ...',
-    hola: 'Hola! Somos SushiNular! Escribí "menu" para ver nuestra carta',
+    hola: 'Hola! Somos SushiNular 🍣 Escribí "menu" para ver nuestra carta',
 }
 
-export const handleUserMessage = async (message) => {
-    const lowerMessage = message.toLowerCase()
+export const handleUserMessage = async (data) => {
+    const lowerMessage = data.message.toLowerCase()
 
     console.log(`[handler] ${lowerMessage}`)
 
@@ -45,7 +45,13 @@ function queryResponse(query) {
     return queries[query]
 }
 
+function saveUser(data) {
+
+}
+
 async function orderResponse(orderMatch) {
+    // TODO: Validar que el producto exista en el menú
+
     const [, quantity, product] = orderMatch
 
     const newOrder = new Order({
@@ -64,7 +70,7 @@ function isOpenResponse() {
     const hour = now.getHours()
 
     if (day >= 2 && day <= 6 && hour >= 11 && hour < 23) {
-        return 'Sí, estamos abiertos hasta las 23 horas!'
+        return 'Sí, hoy estamos abiertos hasta las 23 horas!'
     } else {
         return `Lo siento, estamos cerrados en este momento. ${queries.horario}`
     }

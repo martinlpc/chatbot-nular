@@ -1,6 +1,10 @@
 import { Schema, model } from 'mongoose';
 
 const orderSchema = new Schema({
+    user: {
+        type: String,
+        required: true,
+    },
     quantity: {
         type: Number,
         required: true,
