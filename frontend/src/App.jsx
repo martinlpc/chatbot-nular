@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import './App.css'
+import { ChatLog } from './components/ChatLog';
+import { InputArea } from './components/InputArea';
 
 const SOCKET_SERVER_URL = 'http://localhost:4000';
 
 function App() {
-  //const [user, setUser] = useState(''); // Nombre del usuario
-  const [input, setInput] = useState(''); // Mensaje del usuario
   const [chatLog, setChatLog] = useState([]); // Historial de chat
   const [socket, setSocket] = useState(null); // Instancia del socket
 
@@ -47,54 +47,23 @@ function App() {
   }, []);
 
   // Enviar mensaje al servidor
-  const sendMessage = () => {
-    if (!input.trim() && !user.trim()) {
-      alert('Por favor, ingrese su nombre y mensaje');
-      return; // Evitar mensajes vacíos
-    }
-    const message = { user: 'user', message: input };
+  const sendMessage = (data) => {
+    const message = { user: 'user', message: data };
 
     // Enviar mensaje al backend
     if (socket) {
       socket.emit('msg-user', message);
     } else {
       console.error('Socket no conectado');
+      alert('No se pudo enviar el mensaje. Intente nuevamente en breve');
     }
   };
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', margin: '2rem' }}>
       <h1>Sushi Chatbot</h1>
-      <div
-        style={{
-          border: '1px solid #ccc',
-          padding: '1rem',
-          marginBottom: '1rem',
-          height: '300px',
-          overflowY: 'scroll',
-        }}
-      >
-        {chatLog.map((entry, index) => (
-          <p key={index} style={{ color: entry.user === 'nular' ? 'yellow' : 'green' }}>
-            <strong>{entry.user}:</strong> {entry.message}
-          </p>
-        ))}
-      </div>
-      {/* <textarea
-        value={user}
-        onChange={(e) => setUser(e.target.value)}
-        placeholder="Tu nombre"
-        style={{ width: '100%', marginBottom: '1rem' }}
-      /> */}
-      <textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Escribe tu mensaje aquí..."
-        style={{ width: '100%', marginBottom: '1rem' }}
-      />
-      <button onClick={sendMessage} style={{ padding: '0.5rem 1rem' }}>
-        Enviar
-      </button>
+      <ChatLog chatLog={chatLog} />
+      <InputArea onSend={sendMessage} />
     </div>
   );
 }
