@@ -49,7 +49,7 @@ function queryResponse(query) {
 }
 
 let currentOrder = {} // temporal
-async function orderResponse(orderMatch, userID, userMessage) {
+export async function orderResponse(orderMatch, userID, userMessage) {
     if (!userSessions[userID]) userSessions[userID] = {}
 
     const userOrder = userSessions[userID]

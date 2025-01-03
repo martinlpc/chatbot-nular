@@ -1,6 +1,6 @@
 # Sushi Chatbot
 
-Un chatbot simple que utiliza **Socket.IO** para comunicación en tiempo real y una API REST para cargar mensajes previos.
+Un chatbot simple que utiliza **Socket.IO** para comunicación en tiempo real.
 
 Ejemplos de frases que entiende el bot:
 
@@ -9,6 +9,11 @@ Ejemplos de frases que entiende el bot:
 -   "Cual es su **domicilio**/**direccion**/**ubicacion**?"
 -   "**Horario** de atencion?"
 -   "Quiero ver el **menu**"
+
+El server guarda temporalmente las sesiones de los clientes conectados.
+Cuando un cliente hace un pedido, el bot pregunta por el nombre del mismo y guarda la orden final en la DB.
+
+Las órdenes creadas se pueden obtener vía API REST con GET /api/chatbot/orders
 
 ## Requisitos
 
@@ -85,7 +90,7 @@ Antes de empezar, asegurarse de tener instalado:
 ## Uso
 
 1. Ingresar al frontend en http://localhost:3000
-2. Completar nombre e introducir un mensaje para enviar al chatbot
+2. Introducir un mensaje para enviar al chatbot
 3. Los mensajes se procesan en tiempo real
 
 ## Tecnologías utilizadas
