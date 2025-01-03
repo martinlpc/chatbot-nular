@@ -19,6 +19,9 @@ const io = new Server(server, {
     }
 });
 
+// Almacenamiento de sesiones de usuario temporales (con sus órdenes/pedidos)
+export const userSessions = {}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -38,7 +41,7 @@ const onConnection = (socket) => {
             socket.emit('msg-user', { user: 'Yo', message: data.message });
 
             // Logica de respuesta de bot
-            const response = await handleUserMessage(data);
+            const response = await handleUserMessage(data, socket.id);
             console.log(`[bot response] ${response}`);
             // Respuesta del bot
             socket.emit('msg-bot', { user: 'nular', message: response })
@@ -58,6 +61,7 @@ const onConnection = (socket) => {
 
     socket.on('disconnect', (reason) => {
         console.log(`Usuario '${socket.id}' desconectado (${reason})`);
+        delete userSessions[socket.id];
     });
 }
 

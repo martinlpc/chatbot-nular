@@ -1,4 +1,5 @@
 import Order from "../models/orderModel.js"
+import { userSessions } from "../server.js"
 
 const queries = {
     horario: 'Nuestro horario de atención es de martes a domingo de 11:00 a 23:00 horas',
@@ -9,20 +10,22 @@ const queries = {
     hola: 'Hola! Somos SushiNular 🍣 Escribí "menu" para ver nuestra carta',
 }
 
-export const handleUserMessage = async (data) => {
+export const handleUserMessage = async (data, userID) => {
     const lowerMessage = data.message.toLowerCase()
 
     console.log(`[handler] ${lowerMessage}`)
 
-    // Buscar coincidencia en las claves de las queries
-    const foundQuery = Object.keys(queries).find(query => lowerMessage.includes(query))
-    if (foundQuery) return queryResponse(foundQuery)
-
+    // Detectar si se trata de un usuario que realizo pedido y esta ingresando su nombre
+    if (userSessions[userID] && userSessions[userID].product) return orderResponse(null, userID, data.message)
 
     // Detectar si se está pidiendo una orden
     const orderMatch = lowerMessage.match(/(?:ordenar|quiero|pedir)\s*(\d+)\s*(.*)/i)
     console.log('orderMatch: ', orderMatch)
-    if (orderMatch) return orderResponse(orderMatch)
+    if (orderMatch) return orderResponse(orderMatch, userID, data.message)
+
+    // Buscar coincidencia en las claves de las queries
+    const foundQuery = Object.keys(queries).find(query => lowerMessage.includes(query))
+    if (foundQuery) return queryResponse(foundQuery)
 
 
     // Detectar si se está preguntando si están abiertos en este momento
@@ -45,23 +48,33 @@ function queryResponse(query) {
     return queries[query]
 }
 
-function saveUser(data) {
+let currentOrder = {} // temporal
+async function orderResponse(orderMatch, userID, userMessage) {
+    if (!userSessions[userID]) userSessions[userID] = {}
 
-}
+    const userOrder = userSessions[userID]
 
-async function orderResponse(orderMatch) {
-    // TODO: Validar que el producto exista en el menú
+    if (!userOrder.product) {
+        const [, quantity, product] = orderMatch
+        userSessions[userID] = {
+            quantity: parseInt(quantity),
+            product,
+            timestamp: new Date(),
+        }
 
-    const [, quantity, product] = orderMatch
+        return `Perfecto, agregué ${quantity} ${product} a tu pedido. ¿Cuál es tu nombre?`
 
-    const newOrder = new Order({
-        product,
-        quantity,
-        timestamp: new Date()
-    })
-    await newOrder.save()
+    } else if (!userOrder.username) {
+        userOrder.username = userMessage
 
-    return `Perfecto! Agregamos ${quantity} ${product} a tu pedido`
+        const newOrder = new Order(userOrder)
+        await newOrder.save()
+
+        const { username, quantity, product } = userOrder
+        delete userSessions[userID]
+
+        return `¡Gracias ${username}! Tu pedido de ${quantity} ${product} fue registrado.`
+    }
 }
 
 function isOpenResponse() {
