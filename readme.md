@@ -13,72 +13,93 @@ Ejemplos de frases que entiende el bot:
 El server guarda temporalmente las sesiones de los clientes conectados.
 Cuando un cliente hace un pedido, el bot pregunta por el nombre del mismo y guarda la orden final en la DB.
 
-Las órdenes creadas se pueden obtener vía API REST con GET /api/chatbot/orders
+Por el momento, al ser una versión de prueba, no se hace control de productos al momento de crear los pedidos.
+
+Se dispone de un API REST para ver las órdenes creadas y manejar los productos en la base de datos.
+Endpoints:
+
+```
+GET     /api/orders
+GET     /api/orders/:clientname
+
+GET     /api/products
+GET     /api/products/:code
+POST    /api/products
+PUT     /api/products/:code
+```
 
 ```mermaid
-graph TD
-    subgraph Frontend
-        Client["Client (Port 3000)"]
+graph TB
+    %% External Users
+    User((Customer))
+
+    subgraph "Frontend Container"
+        FrontApp["Frontend Application<br>(React/Vite)"]
     end
 
-    subgraph Backend["Backend (Port 4000)"]
-        Server["Express Server"]
-        SocketIO["Socket.IO Server"]
-        Router["Main Router"]
+    subgraph "Backend Container"
+        direction TB
 
-        subgraph Routes
-            ProductRoutes["Product Routes"]
-            OrderRoutes["Order Routes"]
+        WebServer["Web Server<br>(Express.js)"]
+        SocketServer["Socket Server<br>(Socket.io)"]
+
+        subgraph "API Layer"
+            Router["API Router<br>(Express Router)"]
+            ProductsAPI["Products API<br>(Express)"]
+            OrdersAPI["Orders API<br>(Express)"]
         end
 
-        subgraph Controllers
-            ChatController["Chatbot Controller"]
-            OrderController["Order Controller"]
-            ProductController["Product Controller"]
+        subgraph "Controllers"
+            ChatbotController["Chatbot Controller<br>(Node.js)"]
+            OrderController["Order Controller<br>(Node.js)"]
+            ProductController["Product Controller<br>(Node.js)"]
         end
 
-        subgraph Services
-            OrderService["Order Service"]
-            ProductService["Product Service"]
+        subgraph "Services"
+            OrderService["Order Service<br>(Node.js)"]
+            ProductService["Product Service<br>(Node.js)"]
         end
 
-        subgraph Models
-            OrderModel["Order Model"]
-            ProductModel["Product Model"]
+        subgraph "Data Models"
+            ProductModel["Product Model<br>(Mongoose)"]
+            OrderModel["Order Model<br>(Mongoose)"]
         end
     end
 
-    subgraph Database
-        MongoDB["MongoDB Atlas"]
+    subgraph "Database"
+        MongoDB[("MongoDB Atlas<br>(MongoDB)")]
     end
 
-    %% Frontend connections
-    Client <-->|WebSocket| SocketIO
+    %% Frontend Connections
+    User -->|"Interacts with"| FrontApp
+    FrontApp -->|"HTTP Requests"| WebServer
+    FrontApp -->|"WebSocket"| SocketServer
 
-    %% Main backend flow
-    Server --> Router
-    Server --> SocketIO
+    %% Backend Route Connections
+    WebServer -->|"Routes requests"| Router
+    Router -->|"/api/products"| ProductsAPI
+    Router -->|"/api/orders"| OrdersAPI
 
-    %% Router connections
-    Router --> ProductRoutes
-    Router --> OrderRoutes
+    %% Controller Connections
+    ProductsAPI --> ProductController
+    OrdersAPI --> OrderController
+    SocketServer -->|"Chat messages"| ChatbotController
 
-    %% Route to Controller connections
-    ProductRoutes --> ProductController
-    OrderRoutes --> OrderController
-    SocketIO --> ChatController
-
-    %% Controller to Service connections
-    OrderController --> OrderService
+    %% Service Layer
     ProductController --> ProductService
+    OrderController --> OrderService
+    ChatbotController --> OrderService
 
-    %% Service to Model connections
-    OrderService --> OrderModel
+    %% Data Model Connections
     ProductService --> ProductModel
+    OrderService --> OrderModel
 
-    %% Database connections
-    OrderModel --> MongoDB
-    ProductModel --> MongoDB
+    %% Database Connections
+    ProductModel -->|"CRUD Operations"| MongoDB
+    OrderModel -->|"CRUD Operations"| MongoDB
+
+    %% Session Management
+    ChatbotController -->|"Manages"| UserSessions[("User Sessions<br>(In-Memory)")]
 ```
 
 ## Requisitos
@@ -162,5 +183,5 @@ Antes de empezar, asegurarse de tener instalado:
 ## Tecnologías utilizadas
 
 -   Frontend: Vite, React.js, Socket.IO-client
--   Backend: Node.js, Express, Socket.IO
+-   Backend: Node.js, Express, Socket.IO, Morgan - Testing: mocha, chai
 -   Database: MongoDB Atlas (cloud storage)
