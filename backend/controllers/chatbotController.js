@@ -40,7 +40,7 @@ function queryResponse(query) {
     console.log(`[query] ${query}`)
     if (query === 'menu') {
         // TODO: Consultar DB con menú real
-        const menu = ['Hamburguesa', 'Pizza', 'Ensalada', 'Papas fritas'] // Test
+        const menu = ['Piezas de sushi', 'Maki', 'Sushi salad', 'Nigiris'] // Test
         return `${queries[query]}\n\n${menu.map((item, index) => `${index + 1}. ${item}`).join('\n')}`
     }
 
