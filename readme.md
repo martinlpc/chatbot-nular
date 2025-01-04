@@ -15,6 +15,72 @@ Cuando un cliente hace un pedido, el bot pregunta por el nombre del mismo y guar
 
 Las órdenes creadas se pueden obtener vía API REST con GET /api/chatbot/orders
 
+```mermaid
+graph TD
+    subgraph Frontend
+        Client["Client (Port 3000)"]
+    end
+
+    subgraph Backend["Backend (Port 4000)"]
+        Server["Express Server"]
+        SocketIO["Socket.IO Server"]
+        Router["Main Router"]
+
+        subgraph Routes
+            ProductRoutes["Product Routes"]
+            OrderRoutes["Order Routes"]
+        end
+
+        subgraph Controllers
+            ChatController["Chatbot Controller"]
+            OrderController["Order Controller"]
+            ProductController["Product Controller"]
+        end
+
+        subgraph Services
+            OrderService["Order Service"]
+            ProductService["Product Service"]
+        end
+
+        subgraph Models
+            OrderModel["Order Model"]
+            ProductModel["Product Model"]
+        end
+    end
+
+    subgraph Database
+        MongoDB["MongoDB Atlas"]
+    end
+
+    %% Frontend connections
+    Client <-->|WebSocket| SocketIO
+
+    %% Main backend flow
+    Server --> Router
+    Server --> SocketIO
+
+    %% Router connections
+    Router --> ProductRoutes
+    Router --> OrderRoutes
+
+    %% Route to Controller connections
+    ProductRoutes --> ProductController
+    OrderRoutes --> OrderController
+    SocketIO --> ChatController
+
+    %% Controller to Service connections
+    OrderController --> OrderService
+    ProductController --> ProductService
+
+    %% Service to Model connections
+    OrderService --> OrderModel
+    ProductService --> ProductModel
+
+    %% Database connections
+    OrderModel --> MongoDB
+    ProductModel --> MongoDB
+```
+
 ## Requisitos
 
 Antes de empezar, asegurarse de tener instalado:

@@ -1,9 +1,10 @@
 import express from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { connectToAtlas, PORT } from './config.js';
-import cors from 'cors';
-import chatbotRoutes from './routes/chatbotRoutes.js';
+import router from './routes/index.routes.js';
 import { handleUserMessage } from './controllers/chatbotController.js';
 
 // Configuración básica
@@ -24,8 +25,9 @@ export const userSessions = {}
 
 // Middleware
 app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
-app.use('/api/chatbot', chatbotRoutes);
+app.use('/', router);
 
 connectToAtlas()
 

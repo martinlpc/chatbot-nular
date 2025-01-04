@@ -50,17 +50,17 @@ function queryResponse(query) {
 
 let currentOrder = {} // temporal
 export async function orderResponse(orderMatch, userID, userMessage) {
+    // Declara un objeto vacío para el pedido del usuario si la sesión no existe (es pedido)
     if (!userSessions[userID]) userSessions[userID] = {}
 
+    // Obtiene el pedido del usuario para saber si ya está en proceso (falta pedir nombre) o es nuevo
     const userOrder = userSessions[userID]
 
     if (!userOrder.product) {
         const [, quantity, product] = orderMatch
-        userSessions[userID] = {
-            quantity: parseInt(quantity),
-            product,
-            timestamp: new Date(),
-        }
+        const orderData = { quantity: parseInt(quantity), product, timestamp: new Date() }
+
+        saveUserTempOrder(userID, orderData)
 
         return `Perfecto, agregué ${quantity} ${product} a tu pedido. ¿Cuál es tu nombre?`
 
@@ -87,4 +87,8 @@ function isOpenResponse() {
     } else {
         return `Lo siento, estamos cerrados en este momento. ${queries.horario}`
     }
+}
+
+function saveUserTempOrder(userID, data) {
+    userSessions[userID] = data
 }
