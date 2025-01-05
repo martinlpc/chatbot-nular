@@ -143,7 +143,7 @@ Antes de empezar, asegurarse de tener instalado:
 
     ```
     PORT=4000
-    MONGO_URL= <TuMongoURL>
+    MONGO_URI= <TuMongoURI>
     ```
 
     O cargar el archivo recibido por el desarrollador
