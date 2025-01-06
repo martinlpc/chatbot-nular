@@ -7,6 +7,7 @@
   },
   "main": "server.js",
   "scripts": {
+    "init-db": "node --env-file=.env.example scripts/populate-db.js",
     "test": "mocha",
     "start": "node --watch --env-file=.env.example src/server.js",
     "dev": "node --watch --env-file=.env.example src/server.js"

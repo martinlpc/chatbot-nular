@@ -1,0 +1,34 @@
+[
+    {
+        "code": "sashimi",
+        "name": "Sashimi",
+        "description": "Lonja de pescado a elección",
+        "price": 200.00,
+        "countInStock": 100,
+        "imageUrl": "https://example.com/imageA.jpg"
+    },
+    {
+        "code": "maki",
+        "name": "Maki roll",
+        "description": "Roll clásico de sushi con arroz envuelto en alga",
+        "price": 179.99,
+        "countInStock": 150,
+        "imageUrl": "https://example.com/imageB.jpg"
+    },
+    {
+        "code": "sushisalad",
+        "name": "Sushi Salad",
+        "description": "Ensalada al estilo sashimi",
+        "price": 3000.00,
+        "countInStock": 80,
+        "imageUrl": "https://example.com/imageC.jpg"
+    },
+    {
+        "code": "nigiri",
+        "name": "Nigiri clásico",
+        "description": "Lonja de salmón sobre arroz compacto",
+        "price": 400.00,
+        "countInStock": 50,
+        "imageUrl": "https://example.com/imageD.jpg"
+    }
+]

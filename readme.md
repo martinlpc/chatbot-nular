@@ -98,8 +98,7 @@ graph TB
 ## Comentarios / aclaraciones
 
 -   Al utilizarse Atlas, ya se dispone de una base de datos real en la nube para testear la operación del chatbot.
--   No se incluye un script de carga de datos iniciales, precisamente por lo expuesto en el item anterior.
--   El bot crea los pedidos con el input del usuario sin chequeo de productos disponibles, ya que se trata de una versión de prueba de funcionamiento de respuesta del mismo.
+-   El bot lee los productos de la DB al pedirle el menú, pero crea los pedidos con el input del usuario sin chequeo de stock, ya que se trata de una versión de prueba de funcionamiento de respuesta del mismo.
 
 ## Requisitos
 
@@ -147,7 +146,17 @@ Antes de empezar, asegurarse de tener instalado:
 
     O cargar el archivo recibido por el desarrollador
 
-4. Iniciar el servidor:
+4. Cargar datos iniciales en la base de datos:
+
+    Estando en la carpeta `backend` ingresar lo siguiente por consola/terminal:
+
+    ```bash
+    npm run init-db
+    ```
+
+    Esto correrá un script para poblar la base de datos con productos
+
+5. Iniciar el servidor:
 
     ```bash
     npm start
@@ -184,7 +193,7 @@ Antes de empezar, asegurarse de tener instalado:
 Correr el siguiente comando
 
 ```bash
-cd backend
+cd backend/test
 npm test
 ```
 
