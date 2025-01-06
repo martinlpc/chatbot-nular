@@ -193,7 +193,7 @@ Antes de empezar, asegurarse de tener instalado:
 Correr el siguiente comando
 
 ```bash
-cd backend/test
+cd backend
 npm test
 ```
 
