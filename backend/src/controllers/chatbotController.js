@@ -1,4 +1,4 @@
-import Order from "../models/orderModel.js"
+import { insertOrder } from "../services/orderServices.js"
 import { userSessions } from "../server.js"
 
 const queries = {
@@ -10,7 +10,7 @@ const queries = {
     hola: 'Hola! Somos SushiNular 🍣 Escribí "menu" para ver nuestra carta',
 }
 
-export const handleUserMessage = async (data, userID) => {
+export const handleUserMessage = async (data, userID, next) => {
     const lowerMessage = data.message.toLowerCase()
 
     console.log(`[handler] ${lowerMessage}`)
@@ -21,7 +21,7 @@ export const handleUserMessage = async (data, userID) => {
     // Detectar si se está pidiendo una orden
     const orderMatch = lowerMessage.match(/(?:ordenar|quiero|pedir)\s*(\d+)\s*(.*)/i)
     console.log('orderMatch: ', orderMatch)
-    if (orderMatch) return orderResponse(orderMatch, userID, data.message)
+    if (orderMatch) return orderResponse(orderMatch, userID, data.message, next)
 
     // Buscar coincidencia en las claves de las queries
     const foundQuery = Object.keys(queries).find(query => lowerMessage.includes(query))
@@ -49,7 +49,7 @@ function queryResponse(query) {
 }
 
 let currentOrder = {} // temporal
-export async function orderResponse(orderMatch, userID, userMessage) {
+export async function orderResponse(orderMatch, userID, userMessage, next) {
     // Declara un objeto vacío para el pedido del usuario si la sesión no existe (es pedido)
     if (!userSessions[userID]) userSessions[userID] = {}
 
@@ -67,13 +67,16 @@ export async function orderResponse(orderMatch, userID, userMessage) {
     } else if (!userOrder.username) {
         userOrder.username = userMessage
 
-        const newOrder = new Order(userOrder)
-        await newOrder.save()
+        try {
+            insertOrder(userOrder)
+            const { username, quantity, product } = userOrder
+            delete userSessions[userID]
 
-        const { username, quantity, product } = userOrder
-        delete userSessions[userID]
+            return `¡Gracias ${username}! Tu pedido de ${quantity} ${product} fue registrado.`
+        } catch (error) {
+            next(error)
+        }
 
-        return `¡Gracias ${username}! Tu pedido de ${quantity} ${product} fue registrado.`
     }
 }
 

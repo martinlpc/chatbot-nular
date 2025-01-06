@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import { connectToAtlas, PORT } from './config.js';
 import router from './routes/index.routes.js';
 import { handleUserMessage } from './controllers/chatbotController.js';
+import errorHandler from './middleware/errorHandler.js';
 
 // Configuración básica
 const app = express();
@@ -28,6 +29,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use('/', router);
+app.use(errorHandler)
 
 connectToAtlas()
 
@@ -65,6 +67,10 @@ const onConnection = (socket) => {
         console.log(`Usuario '${socket.id}' desconectado (${reason})`);
         delete userSessions[socket.id];
     });
+
+    socket.on('error', (err) => {
+        console.error(`[Socket Error] ${err.message}`)
+    })
 }
 
 io.on('connection', onConnection);
