@@ -14,6 +14,7 @@ El server guarda temporalmente las sesiones de los clientes conectados.
 Cuando un cliente hace un pedido, el bot pregunta por el nombre del mismo y guarda la orden final en la DB.
 
 Por el momento, al ser una versión de prueba, no se hace control de productos al momento de crear los pedidos.
+La colección de 'productos' es modificable, pero no tiene uso al momento con el sistema del bot.
 
 Se dispone de un API REST para ver las órdenes creadas y manejar los productos en la base de datos.
 Endpoints:
@@ -178,5 +179,5 @@ Antes de empezar, asegurarse de tener instalado:
 ## Tecnologías utilizadas
 
 -   Frontend: Vite, React.js, Socket.IO-client
--   Backend: Node.js, Express, Socket.IO, Morgan - Testing: mocha, chai
+-   Backend: Node.js, Express, Socket.IO, Morgan, Mongoose - Testing: mocha, chai
 -   Database: MongoDB Atlas (cloud storage)

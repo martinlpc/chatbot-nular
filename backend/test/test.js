@@ -1,7 +1,8 @@
 import { io as ioc } from 'socket.io-client';
 import { assert } from 'chai';
 import { afterEach, describe, it } from 'mocha';
-describe('Socket.io connection', () => {
+
+describe('Socket.io connection test', () => {
     let socketClient
 
     before((done) => {
@@ -79,8 +80,8 @@ describe('Socket.io connection', () => {
         });
     });
 
-    it('debería recibir el nombre del usuario y confirmar el pedido', (done) => {
-        const userName = 'Juan';
+    it('debería recibir el nombre del usuario ("juan") y confirmar el pedido', (done) => {
+        const userName = 'juan';
         socketClient.emit('msg-user', { message: userName });
 
         socketClient.on('msg-bot', (data) => {
@@ -94,4 +95,33 @@ describe('Socket.io connection', () => {
     });
 
 
+})
+
+describe('API /api/orders', () => {
+    const apiURL = 'http://localhost:4000/api'
+
+    it('debería responder con status=200 al consultar por las órdenes', async () => {
+        try {
+            const response = await fetch(`${apiURL}/orders`)
+            assert.equal(response.status, 200)
+        } catch (error) {
+            assert.fail(`Error en  la solicitud: ${error.message}`)
+        }
+    })
+
+    it('debería devolver una orden del cliente "juan" ya que se creó en el set de pruebas anterior', async () => {
+        try {
+            const res = await fetch(`${apiURL}/orders/juan`)
+            const response = await res.json()
+
+            assert.equal(res.status, 200)
+            assert.strictEqual(response.success, true)
+            assert.ok(Array.isArray(response.orders))
+
+            const found = response.orders.some(order => order.username === 'juan')
+            assert.ok(found, 'No se encontró una orden con nombre de cliente "juan"')
+        } catch (error) {
+            assert.fail(`Error en la solicitud: ${error.message}`)
+        }
+    })
 })
