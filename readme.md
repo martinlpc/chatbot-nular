@@ -13,9 +13,6 @@ Ejemplos de frases que entiende el bot:
 El server guarda temporalmente las sesiones de los clientes conectados.
 Cuando un cliente hace un pedido, el bot pregunta por el nombre del mismo y guarda la orden final en la DB.
 
-Por el momento, al ser una versión de prueba, no se hace control de productos al momento de crear los pedidos.
-La colección de 'productos' es modificable, pero no tiene uso al momento con el sistema del bot.
-
 Se dispone de un API REST para ver las órdenes creadas y manejar los productos en la base de datos.
 Endpoints:
 
@@ -97,6 +94,12 @@ graph TB
     OrderModel -->|"Persists data"| MongoDB
     ProductModel -->|"Persists data"| MongoDB
 ```
+
+## Comentarios / aclaraciones
+
+-   Al utilizarse Atlas, ya se dispone de una base de datos real en la nube para testear la operación del chatbot.
+-   No se incluye un script de carga de datos iniciales, precisamente por lo expuesto en el item anterior.
+-   El bot crea los pedidos con el input del usuario sin chequeo de productos disponibles, ya que se trata de una versión de prueba de funcionamiento de respuesta del mismo.
 
 ## Requisitos
 
