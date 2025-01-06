@@ -104,7 +104,7 @@ graph TB
 
 Antes de empezar, asegurarse de tener instalado:
 
--   **Node.js** (v14 o superior)
+-   **Node.js** (v22.12.0 es la utilizada en este proyecto)
 
 -   **Yarn** (Para lanzar el cliente, ya que es mas rápido y eficiente con Vite)
 
