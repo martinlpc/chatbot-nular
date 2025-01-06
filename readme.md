@@ -30,32 +30,30 @@ PUT     /api/products/:code
 
 ```mermaid
 graph TB
-    %% External Users
-    User((Customer))
+    User((User))
 
     subgraph "Frontend Container"
-        FrontApp["Frontend Application<br>(React/Vite)"]
+        FrontendApp["Frontend Application<br>(React + Vite)"]
+
+        subgraph "Frontend Components"
+            ChatInterface["Chat Interface<br>(React Components)"]
+            WebSocket["WebSocket Client<br>(Socket.io-client)"]
+        end
     end
 
     subgraph "Backend Container"
-        direction TB
+        APIServer["API Server<br>(Express.js)"]
+        SocketServer["WebSocket Server<br>(Socket.io)"]
 
-        WebServer["Web Server<br>(Express.js)"]
-        SocketServer["Socket Server<br>(Socket.io)"]
-
-        subgraph "API Layer"
-            Router["API Router<br>(Express Router)"]
-            ProductsAPI["Products API<br>(Express)"]
-            OrdersAPI["Orders API<br>(Express)"]
-        end
-
-        subgraph "Controllers"
+        subgraph "API Components"
+            Router["Router<br>(Express Router)"]
+            ErrorHandler["Error Handler<br>(Express Middleware)"]
             ChatbotController["Chatbot Controller<br>(Node.js)"]
             OrderController["Order Controller<br>(Node.js)"]
             ProductController["Product Controller<br>(Node.js)"]
         end
 
-        subgraph "Services"
+        subgraph "Service Layer"
             OrderService["Order Service<br>(Node.js)"]
             ProductService["Product Service<br>(Node.js)"]
         end
@@ -66,40 +64,37 @@ graph TB
         end
     end
 
-    subgraph "Database"
+    subgraph "Database Container"
         MongoDB[("MongoDB Atlas<br>(MongoDB)")]
     end
 
-    %% Frontend Connections
-    User -->|"Interacts with"| FrontApp
-    FrontApp -->|"HTTP Requests"| WebServer
-    FrontApp -->|"WebSocket"| SocketServer
+    %% Frontend connections
+    User -->|"Interacts with"| FrontendApp
+    FrontendApp -->|"Contains"| ChatInterface
+    FrontendApp -->|"Uses"| WebSocket
 
-    %% Backend Route Connections
-    WebServer -->|"Routes requests"| Router
-    Router -->|"/api/products"| ProductsAPI
-    Router -->|"/api/orders"| OrdersAPI
+    %% WebSocket connections
+    WebSocket -->|"Connects to"| SocketServer
+    SocketServer -->|"Handles messages"| ChatbotController
 
-    %% Controller Connections
-    ProductsAPI --> ProductController
-    OrdersAPI --> OrderController
-    SocketServer -->|"Chat messages"| ChatbotController
+    %% API connections
+    FrontendApp -->|"HTTP Requests"| APIServer
+    APIServer -->|"Routes requests"| Router
+    Router -->|"Routes to"| OrderController
+    Router -->|"Routes to"| ProductController
+    APIServer -->|"Uses"| ErrorHandler
 
-    %% Service Layer
-    ProductController --> ProductService
-    OrderController --> OrderService
-    ChatbotController --> OrderService
+    %% Controller to Service connections
+    OrderController -->|"Uses"| OrderService
+    ProductController -->|"Uses"| ProductService
 
-    %% Data Model Connections
-    ProductService --> ProductModel
-    OrderService --> OrderModel
+    %% Service to Model connections
+    OrderService -->|"Uses"| OrderModel
+    ProductService -->|"Uses"| ProductModel
 
-    %% Database Connections
-    ProductModel -->|"CRUD Operations"| MongoDB
-    OrderModel -->|"CRUD Operations"| MongoDB
-
-    %% Session Management
-    ChatbotController -->|"Manages"| UserSessions[("User Sessions<br>(In-Memory)")]
+    %% Database connections
+    OrderModel -->|"Persists data"| MongoDB
+    ProductModel -->|"Persists data"| MongoDB
 ```
 
 ## Requisitos
