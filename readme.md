@@ -176,6 +176,17 @@ Antes de empezar, asegurarse de tener instalado:
 2. Introducir un mensaje para enviar al chatbot
 3. Los mensajes se procesan en tiempo real
 
+## Testing
+
+Correr el siguiente comando
+
+```bash
+cd backend
+npm test
+```
+
+Se testean el WebSocket del bot y algunos endpoints de la API.
+
 ## Tecnologías utilizadas
 
 -   Frontend: Vite, React.js, Socket.IO-client
