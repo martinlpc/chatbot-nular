@@ -7,6 +7,7 @@ export const findAllProducts = async () => {
         if (!products.length) {
             throw new CustomError('No se encontraron productos', 404)
         }
+        return products
     } catch (error) {
         throw new CustomError(error.message || 'Error en base de datos', 500)
     }
@@ -18,6 +19,7 @@ export const findProductById = async (id) => {
         if (!product) {
             throw new CustomError(`No se encontró el producto con id '${id}'`, 404)
         }
+        return product
     } catch (error) {
         throw new CustomError(error.message || 'Error en base de datos', 500)
     }

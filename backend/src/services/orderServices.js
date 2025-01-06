@@ -7,6 +7,7 @@ export const findAllOrders = async () => {
         if (!orders.length) {
             throw new CustomError('No se encontraron ordenes', 404)
         }
+        return orders
     } catch (error) {
         throw new CustomError(error.message || 'Error en base de datos', 500)
     }
@@ -14,10 +15,11 @@ export const findAllOrders = async () => {
 
 export const findOrderByClientName = async (clientName) => {
     try {
-        const order = await orderModel.findBy(clientName)
+        const order = await orderModel.find({ username: clientName })
         if (!order) {
             throw new CustomError(`No se enncontró orden del cliente '${clientName}'`, 404)
         }
+        return order
     } catch (error) {
         throw new CustomError(error.message || 'Error en base de datos', 500)
     }

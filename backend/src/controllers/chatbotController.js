@@ -29,7 +29,7 @@ export const handleUserMessage = async (data, userID, next) => {
 
 
     // Detectar si se está preguntando si están abiertos en este momento
-    if (lowerMessage.includes('abierto' || 'abiertos')) return isOpenResponse()
+    if (lowerMessage.includes('abierto' || 'abiertos' || 'atendiendo')) return isOpenResponse()
 
 
     // Respuesta por defecto si no se detectaron coincidencias
@@ -48,7 +48,6 @@ function queryResponse(query) {
     return queries[query]
 }
 
-let currentOrder = {} // temporal
 export async function orderResponse(orderMatch, userID, userMessage, next) {
     // Declara un objeto vacío para el pedido del usuario si la sesión no existe (es pedido)
     if (!userSessions[userID]) userSessions[userID] = {}
@@ -65,7 +64,7 @@ export async function orderResponse(orderMatch, userID, userMessage, next) {
         return `Perfecto, agregué ${quantity} ${product} a tu pedido. ¿Cuál es tu nombre?`
 
     } else if (!userOrder.username) {
-        userOrder.username = userMessage
+        userOrder.username = userMessage.toLowerCase()
 
         try {
             insertOrder(userOrder)
